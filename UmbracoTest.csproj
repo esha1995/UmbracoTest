@@ -5,6 +5,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="ClientDependency" Version="1.9.10" />
+        <PackageReference Include="ClientDependency-Mvc" Version="1.9.3" />
         <PackageReference Include="Umbraco.Cms" Version="9.1.1" />
     </ItemGroup>
 
@@ -13,8 +15,6 @@
         <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
         <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2" />
     </ItemGroup>
-
-
 
     <PropertyGroup>
         <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
