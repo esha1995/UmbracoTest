@@ -5,19 +5,36 @@
 	Layout = "Master.cshtml";
 }
 
+<div class="container px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+        <div class="col-md-10 col-lg-8 col-xl-7">
 
- <!-- Page Header-->
-        <header class="masthead" style="background-image: url('assets/img/home-bg.jpg')">
-            <div class="container position-relative px-4 px-lg-5">
-                <div class="row gx-4 gx-lg-5 justify-content-center">
-                    <div class="col-md-10 col-lg-8 col-xl-7">
-                        <div class="site-heading">
-                            <h1>@Model.Name</h1>
-                            <span class="subheading">A Blog Theme by Start Bootstrap</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
 
-@Html.Partial("Partials/latestHouses.cshtml")
+@{
+    var houses = Umbraco.Content(Guid.Parse("b82ef794-6d89-4ccc-9b23-8ef35c3706cc")).Children.Where(x => x.IsVisible());
+}
+
+@foreach (var house in houses)
+{
+
+    var mediaPicker = house.Value<IPublishedContent>("mainImage");
+        
+    @if (mediaPicker != null)
+    {
+        <img src="@mediaPicker.Url()" style="width:200px" alt="@mediaPicker.Value("alt")" />
+    }
+
+    <div class="post-preview">
+        <a href="post.html">
+            <h2 class="post-title">@house.Name</h2>
+            <h3 class="post-subtitle">@house.Value("subtitle")</h3>
+        </a>
+        <p class="post-meta">
+            Seller is
+            <a href="#!">@house.Value("sellerName")</a>
+            set to sell on @house.Value("houseDate")
+        </p>
+    </div>
+    <hr class="my-4" />
+
+}
