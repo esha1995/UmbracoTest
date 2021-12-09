@@ -1,15 +1,22 @@
 ﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 
- <!-- Page Header-->
-        <header class="masthead" style="background-image: url('assets/img/home-bg.jpg')">
-            <div class="container position-relative px-4 px-lg-5">
-                <div class="row gx-4 gx-lg-5 justify-content-center">
-                    <div class="col-md-10 col-lg-8 col-xl-7">
-                        <div class="site-heading">
-                            <h1>@Model.Name</h1>
-                            <span class="subheading">A Blog Theme by Start Bootstrap</span>
-                        </div>
-                    </div>
+@{
+    var mediaPicker = Model.HasValue("mainImage") ? Model.Value<IPublishedContent>("mainImage") : Umbraco.Content(Guid.Parse("1f932451-adf4-4883-8e55-6cc3ab807401")).Value<IPublishedContent>("mainImage");
+    var title = Model.HasValue("title") ? Model.Value("title") : Model.Name;
+    var subtitle = Model.HasValue("subtitle") ? Model.Value("subtitle") : ""; 
+}
+
+    <header class="masthead" style="background-image: url('@mediaPicker.Url()')">
+    <div class="container position-relative px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                <div class="site-heading">
+                    <h1>@title</h1>
+                    <span class="subheading">@subtitle</span>
                 </div>
             </div>
-        </header>
+        </div>
+    </div>
+</header>
+
+

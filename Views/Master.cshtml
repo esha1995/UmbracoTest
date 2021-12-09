@@ -35,7 +35,6 @@
   		
 	@Html.Partial("Partials/navigation.cshtml")
     @RenderBody()
-	@Html.Partial("Partials/footer.cshtml")
-    @await SmidgeHelper.JsHereAsync()
+    @await SmidgeHelper.JsHereAsync("jsBundle")
     </body>
 </html>
