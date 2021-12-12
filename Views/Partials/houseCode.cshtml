@@ -1,0 +1,87 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@using UmbracoTest.Helpers
+
+@{
+    var houseList = Umbraco.Content(Guid.Parse("b82ef794-6d89-4ccc-9b23-8ef35c3706cc"));
+    var houses = houseList.Children.Where(x => x.IsVisible()).OrderByDescending(y => y.Value("houseDate"));
+    bool isHouseList = houseList.Id == Model.Id;
+    var numberOfHouses = houses.Count();
+    int fallbackPageSize = isHouseList ? 5 : 3;
+    int counter = 0;
+    int pageSize = QueryStringHelper.getIntFromQueryString(Context, "size", fallbackPageSize);
+    int pageNumber = QueryStringHelper.getIntFromQueryString(Context, "page", 1);
+    var pageOfHouses = houses.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+    var pageCount = numberOfHouses > 0 ? Math.Ceiling((double) numberOfHouses / pageSize) : 1;
+}
+
+<div class="container px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+        <div class="col-md-10 col-lg-8 col-xl-7">
+
+    <h4 class="post-subtitle">There are @numberOfHouses houses for sell</h4>
+
+@foreach (var house in pageOfHouses)
+{
+    var mediaPicker = house.Value<IPublishedContent>("mainImage");
+    var title = house.HasValue("title") ? house.Value("title") : house.Name;
+    var subtitle = house.HasValue("subtitle") ? house.Value("subtitle") : "";
+    
+    if (mediaPicker != null)
+    {
+        <img src="@mediaPicker.Url()" style="width:200px" alt="@mediaPicker.Value("alt")" />
+    }
+
+    <div class="post-preview">
+        <a href="@house.Url()">
+            <h2 class="post-title">@title</h2>
+            <h3 class="post-subtitle">@subtitle</h3>
+        </a>
+        <p class="post-meta">
+            Seller is
+            <a href="#!">@house.Value("sellerName")</a>
+            set to sell on @house.Value("houseDate")
+        </p>
+    </div>
+
+    // divider between houses (only if not last house)
+    counter++;
+    if(counter != pageSize)
+    {
+        <hr class="my-4" />
+    }
+}
+
+@if(isHouseList)
+{
+    if(pageCount > 1)
+    {
+        <div class="paging-block">
+            @if(pageNumber > 1)
+            {
+                <a class="btn btn -primary float-right" href="@($"{houseList.Url()}?page={pageNumber - 1}&size={pageSize}")">Prev</a>
+            }
+            else
+            {
+                @Html.Raw("&nbsp;");
+            }
+        </div>
+        <div class="paging-block text-center">
+            <span>Page @pageNumber of @pageCount</span>
+        </div>
+        <div class="paging-block">
+            @if(pageNumber < pageCount)
+            {
+                <a class="btn btn-primary float-right" href="@($"{houseList.Url()}?page={pageNumber + 1}&size={pageSize}")">Next</a>
+            }
+            else
+            {
+                @Html.Raw("&nbsp;");
+            }
+        </div>
+    }
+}
+else
+{
+    <a class="btn btn-primary float-right" href="@(houseList.Url())">See all houses for sell</a>
+}

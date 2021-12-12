@@ -8,6 +8,8 @@
         <PackageReference Include="ClientDependency" Version="1.9.10" />
         <PackageReference Include="ClientDependency-Mvc" Version="1.9.3" />
         <PackageReference Include="Umbraco.Cms" Version="9.1.1" />
+        <PackageReference Include="uSync" Version="9.0.4" />
+        <PackageReference Include="uSync.Complete" Version="9.0.4" />
     </ItemGroup>
 
     <!-- Force windows to use ICU. Otherwise Windows 10 2019H1+ will do it, but older windows 10 and most if not all winodws servers will run NLS -->

@@ -1,51 +1,13 @@
 ﻿@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@using UmbracoTest.Helpers
 
 @{
 	Layout = "Master.cshtml";
 }
 
-<div class="container px-4 px-lg-5">
-    <div class="row gx-4 gx-lg-5 justify-content-center">
-        <div class="col-md-10 col-lg-8 col-xl-7">
+@Html.Partial("Partials/header.cshtml")
 
+@Html.Partial("Partials/houseCode.cshtml")
 
-@{
-    var houses = Umbraco.Content(Guid.Parse("b82ef794-6d89-4ccc-9b23-8ef35c3706cc")).Children.Where(x => x.IsVisible());
-    var numberOfHouses = houses.Count();
-    int counter = 0;
-}
-
-<h4 class="post-subtitle">There are @numberOfHouses houses for sell</h4>
-
-@foreach (var house in houses)
-{
-    var mediaPicker = house.Value<IPublishedContent>("mainImage");
-    var title = house.HasValue("title") ? house.Value("title") : house.Name;
-    var subtitle = house.HasValue("subtitle") ? house.Value("subtitle") : "";
-    
-    if (mediaPicker != null)
-    {
-        <img src="@mediaPicker.Url()" style="width:200px" alt="@mediaPicker.Value("alt")" />
-    }
-
-    <div class="post-preview">
-        <a href="@house.Url()">
-            <h2 class="post-title">@title</h2>
-            <h3 class="post-subtitle">@subtitle</h3>
-        </a>
-        <p class="post-meta">
-            Seller is
-            <a href="#!">@house.Value("sellerName")</a>
-            set to sell on @house.Value("houseDate")
-        </p>
-    </div>
-
-    // divider between houses (only if not last house)
-    counter++;
-    if(counter != numberOfHouses)
-    {
-        <hr class="my-4" />
-    }
-    
-}
+@Html.Partial("Partials/footer.cshtml")
