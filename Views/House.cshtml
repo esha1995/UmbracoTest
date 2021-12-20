@@ -16,10 +16,10 @@
         <div class="row gx-4 gx-lg-5 justify-content-center">
             <div class="col-md-10 col-lg-8 col-xl-7">
                 <a class="btn btn-primary float-right" href="@(houseList.Url())">Go back</a>
-                <p class="post-meta">Seller: @Model.Value("sellerName")</p>
-                <p class="post-meta">Date: @Model.Value("houseDate"),</p>
-                <p class="post-meta">Price: @Model.Value("price"),</p>
-                <p class="post-meta">Area code: @Model.Value("areaCodes")</p>
+                <p class="post-meta"><strong>Seller: </strong>@Model.Value("sellerName")</p>
+                <p class="post-meta"><strong>Date: </strong>@Model.Value("houseDate"),</p>
+                <p class="post-meta"><strong>Price: </strong>@Model.Value("price"),</p>
+                <p class="post-meta"><strong>Area Code: </strong> @Model.Value("areaCodes")</p>
                 @Html.GetGridHtml(Model, "mainContent")
             </div>
         </div>

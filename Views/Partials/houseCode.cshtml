@@ -1,8 +1,14 @@
 ﻿@using Umbraco.Cms.Core.Services
+@using Umbraco.Cms.Core.HealthChecks.Checks
+@using Umbraco.Cms.Core.Services
+@using Umbraco.Cms.Core.PropertyEditors;
 @using Umbraco.Cms.Core.Services.Implement
+@using Umbraco.Cms.Infrastructure
 @using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @using UmbracoTest.Helpers
+@using Umbraco.Cms.Core.Models
+@inject IDataTypeService DataTypeService
 
 @{
     // variables
@@ -13,21 +19,19 @@
     string areaCoder = QueryStringHelper.getQueryString(Context, "areaCode", "all");
     string sortBy = QueryStringHelper.getQueryString(Context, "category", "");
 
+
+    var areaCodeList = (DropDownFlexibleConfiguration)DataTypeService.GetDataType(1123).Configuration;
+    
     // sorting the list of houses
     if(isHouseList)
     {
-        // if areacode is one of these then 
-        if(areaCoder == "2000")
+        // getting all types of area codes created 
+        foreach (var value in areaCodeList.Items)
         {
-            houses = houses.Where(x => (string)x.Value("areaCodes") == "2000");
-        }
-        if(areaCoder == "2300") 
-        {
-            houses = houses.Where(x => (string)x.Value("areaCodes") == "2300");
-        }
-        if(areaCoder == "2200")
-        {
-            houses = houses.Where(x => (string)x.Value("areaCodes") == "2200");
+            if(areaCoder == value.Value)
+            {
+                houses = houses.Where(x => (string)x.Value("areaCodes") == value.Value);
+            }       
         }
         if(areaCoder == "All")
         {
@@ -60,7 +64,6 @@
         houses = houses.Where(x => x.IsVisible()).OrderByDescending(y => y.Value("houseDate"));
     }
     
- 
     // getting values 
     int numberOfHouses = houses.Count();
     int fallbackPageSize = isHouseList ? 5 : 3; // if houselist then size 5 else 3
@@ -83,9 +86,11 @@
         <div class="dropdown-content">
             <strong>Area code: </strong>
             <a href="@($"{houseList.Url()}?areaCode=all&category={sortBy}")">All │</a>
-            <a href="@($"{houseList.Url()}?areaCode=2000&category={sortBy}")">2000 │</a>
-            <a href="@($"{houseList.Url()}?areaCode=2300&category={sortBy}")">2300 │</a>
-            <a href="@($"{houseList.Url()}?areaCode=2200&category={sortBy}")">2200</a>
+            @foreach (var value in areaCodeList.Items)
+            {
+                // getting all created zipcodes and printing them
+                <a href="@($"{houseList.Url()}?areaCode={value.Value}&category={sortBy}")">@value.Value │</a>
+            }
         </div>
     </div>
 
@@ -93,7 +98,7 @@
         <div class="dropdown-content">
             <strong>Sort by date: </strong>
             <a href="@($"{houseList.Url()}?areaCode={areaCoder}&category=datehl")">high - low │</a>
-            <a href="@($"{houseList.Url()}?areaCode={areaCoder}&category=datelh")">low - high</a>
+            <a href="@($"{houseList.Url()}?areaCode={areaCoder}&category=datelh")">low - high │</a>
         </div>
     </div>
 
@@ -101,21 +106,22 @@
         <div class="dropdown-content">
             <strong>Sort by price: </strong>
             <a href="@($"{houseList.Url()}?areaCode={areaCoder}&category=pricehl")">high - low │</a>
-            <a href="@($"{houseList.Url()}?areaCode={areaCoder}&category=pricelh")">low - high</a>
+            <a href="@($"{houseList.Url()}?areaCode={areaCoder}&category=pricelh")">low - high │</a>
         </div>
     </div>
     <hr class="my-4" />
 }
+
 else if(!isHouseList)
 {
     // if hompage then write this instead
-    <p class="post-meta">@numberOfHouses houses for sell. Three newest houses: </p>
+    <p class="post-meta"><strong>@numberOfHouses</strong> houses for sell. Three newest houses: </p>
 }
 
 @foreach (var house in pageOfHouses)
 {
     // create lidt of houses 
-    var mediaPicker = house.Value<IPublishedContent>("mainImage");
+    var mediaPicker = (IPublishedContent)house.Value("mainImage");
     var adress = house.HasValue("adress") ? house.Value("adress") : house.Name;
     
     if (mediaPicker != null)
@@ -128,10 +134,10 @@ else if(!isHouseList)
             <h2 class="post-title">@adress</h2>
         </a>
         <p class="post-meta">
-            Seller: @house.Value("sellerName"),
-            Date: @house.Value("houseDate"),
-            Price: @house.Value("price"),
-            Area code: @house.Value("areaCodes")
+            <strong>Seller:</strong> @house.Value("sellerName"),
+            <strong>Date:</strong> @house.Value("houseDate"),
+            <strong>Price:</strong> @house.Value("price"),
+            <strong>Area code: </strong>@house.Value("areaCodes")
         </p>
     </div>
 
@@ -143,35 +149,33 @@ else if(!isHouseList)
     }
 }
 
-@if(isHouseList)
+@if(isHouseList && pageCount > 1)
 {
-    if(pageCount > 1)
-    {
-        <div class="paging-block">
-            @if(pageNumber > 1)
-            {
-                <a class="btn btn-primary float-right" href="@($"{houseList.Url()}?category={sortBy}&areaCode={areaCoder}&page={pageNumber - 1}&size={pageSize}")">Prev</a>
-            }
-            else
-            {
-                @Html.Raw("&nbsp;");
-            }
-            @if(pageNumber < pageCount)
-            {
-                <a class="btn btn-primary float-right" href="@($"{houseList.Url()}?category={sortBy}&areaCode={areaCoder}&page={pageNumber + 1}&size={pageSize}")">Next</a>
-            }
-            else
-            {
-                @Html.Raw("&nbsp;");
-            }
-        </div>
+ 
+    <div class="paging-block">
+        @if(pageNumber > 1)
+        {
+            <a class="btn btn-primary float-right" href="@($"{houseList.Url()}?category={sortBy}&areaCode={areaCoder}&page={pageNumber - 1}&size={pageSize}")">Prev</a>
+        }
+        else
+        {
+            @Html.Raw("&nbsp;");
+        }
+        @if(pageNumber < pageCount)
+        {
+            <a class="btn btn-primary float-right" href="@($"{houseList.Url()}?category={sortBy}&areaCode={areaCoder}&page={pageNumber + 1}&size={pageSize}")">Next</a>
+        }
+        else
+        {
+            @Html.Raw("&nbsp;");
+        }
+    </div>
 
-        <div class="paging-block text-center">
-            <span>Page @pageNumber of @pageCount</span>
-        </div>
-    }
+    <div class="paging-block text-center">
+        <span>Page @pageNumber of <strong>@pageCount</strong></span>
+    </div>
 }
-else
+@if(!isHouseList)
 {
     <a class="btn btn-primary float-right" href="@(houseList.Url())">See all houses for sell</a>
 }
