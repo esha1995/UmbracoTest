@@ -1,15 +1,71 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+﻿@using Umbraco.Cms.Core.Services
+@using Umbraco.Cms.Core.Services.Implement
+@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @using UmbracoTest.Helpers
 
 @{
+    // variables
     var houseList = Umbraco.Content(Guid.Parse("b82ef794-6d89-4ccc-9b23-8ef35c3706cc"));
-    var houses = houseList.Children.Where(x => x.IsVisible()).OrderByDescending(y => y.Value("houseDate"));
     bool isHouseList = houseList.Id == Model.Id;
-    var numberOfHouses = houses.Count();
-    int fallbackPageSize = isHouseList ? 5 : 3;
+    var houses = houseList.Children();
+
+    string areaCoder = QueryStringHelper.getQueryString(Context, "areaCode", "all");
+    string sortBy = QueryStringHelper.getQueryString(Context, "category", "");
+
+    // sorting the list of houses
+    if(isHouseList)
+    {
+        // if areacode is one of these then 
+        if(areaCoder == "2000")
+        {
+            houses = houses.Where(x => (string)x.Value("areaCodes") == "2000");
+        }
+        if(areaCoder == "2300") 
+        {
+            houses = houses.Where(x => (string)x.Value("areaCodes") == "2300");
+        }
+        if(areaCoder == "2200")
+        {
+            houses = houses.Where(x => (string)x.Value("areaCodes") == "2200");
+        }
+        if(areaCoder == "All")
+        {
+            houses = Umbraco.Content(Guid.Parse("b82ef794-6d89-4ccc-9b23-8ef35c3706cc")).Children();
+        }
+        
+        // sort by depended in the category query
+        if(sortBy == "datelh")
+        {
+            houses = houses.Where(x => x.IsVisible()).OrderBy(y => y.Value("houseDate"));
+        }
+        if (sortBy == "datehl")
+        {
+            houses = houses.Where(x => x.IsVisible()).OrderByDescending(y => y.Value("houseDate"));
+        }
+        if (sortBy == "pricelh")
+        {
+            houses = houses.Where(x => x.IsVisible()).OrderBy(y => y.Value("price"));
+        }
+        if (sortBy == "pricehl")
+        {
+            houses = houses.Where(x => x.IsVisible()).OrderByDescending(y => y.Value("price"));
+        }
+
+    }
+
+    // if not house list page (meaning home page then descend by date)
+    else 
+    {
+        houses = houses.Where(x => x.IsVisible()).OrderByDescending(y => y.Value("houseDate"));
+    }
+    
+ 
+    // getting values 
+    int numberOfHouses = houses.Count();
+    int fallbackPageSize = isHouseList ? 5 : 3; // if houselist then size 5 else 3
     int counter = 0;
-    int pageSize = QueryStringHelper.getIntFromQueryString(Context, "size", fallbackPageSize);
+    int pageSize = QueryStringHelper.getIntFromQueryString(Context, "size", fallbackPageSize); 
     int pageNumber = QueryStringHelper.getIntFromQueryString(Context, "page", 1);
     var pageOfHouses = houses.Skip((pageNumber - 1) * pageSize).Take(pageSize);
     var pageCount = numberOfHouses > 0 ? Math.Ceiling((double) numberOfHouses / pageSize) : 1;
@@ -17,15 +73,50 @@
 
 <div class="container px-4 px-lg-5">
     <div class="row gx-4 gx-lg-5 justify-content-center">
-        <div class="col-md-10 col-lg-8 col-xl-7">
+        <div class="col-mdx-10 col-lg-8 col-xl-7">
 
-    <h4 class="post-subtitle">There are @numberOfHouses houses for sell</h4>
+
+@if(isHouseList && pageNumber == 1)
+{
+    // sorting and adding to query 
+    <div class="dropdown">
+        <div class="dropdown-content">
+            <strong>Area code: </strong>
+            <a href="@($"{houseList.Url()}?areaCode=all&category={sortBy}")">All │</a>
+            <a href="@($"{houseList.Url()}?areaCode=2000&category={sortBy}")">2000 │</a>
+            <a href="@($"{houseList.Url()}?areaCode=2300&category={sortBy}")">2300 │</a>
+            <a href="@($"{houseList.Url()}?areaCode=2200&category={sortBy}")">2200</a>
+        </div>
+    </div>
+
+    <div class="dropdown">
+        <div class="dropdown-content">
+            <strong>Sort by date: </strong>
+            <a href="@($"{houseList.Url()}?areaCode={areaCoder}&category=datehl")">high - low │</a>
+            <a href="@($"{houseList.Url()}?areaCode={areaCoder}&category=datelh")">low - high</a>
+        </div>
+    </div>
+
+    <div class="dropdown">
+        <div class="dropdown-content">
+            <strong>Sort by price: </strong>
+            <a href="@($"{houseList.Url()}?areaCode={areaCoder}&category=pricehl")">high - low │</a>
+            <a href="@($"{houseList.Url()}?areaCode={areaCoder}&category=pricelh")">low - high</a>
+        </div>
+    </div>
+    <hr class="my-4" />
+}
+else if(!isHouseList)
+{
+    // if hompage then write this instead
+    <p class="post-meta">@numberOfHouses houses for sell. Three newest houses: </p>
+}
 
 @foreach (var house in pageOfHouses)
 {
+    // create lidt of houses 
     var mediaPicker = house.Value<IPublishedContent>("mainImage");
-    var title = house.HasValue("title") ? house.Value("title") : house.Name;
-    var subtitle = house.HasValue("subtitle") ? house.Value("subtitle") : "";
+    var adress = house.HasValue("adress") ? house.Value("adress") : house.Name;
     
     if (mediaPicker != null)
     {
@@ -34,19 +125,19 @@
 
     <div class="post-preview">
         <a href="@house.Url()">
-            <h2 class="post-title">@title</h2>
-            <h3 class="post-subtitle">@subtitle</h3>
+            <h2 class="post-title">@adress</h2>
         </a>
         <p class="post-meta">
-            Seller is
-            <a href="#!">@house.Value("sellerName")</a>
-            set to sell on @house.Value("houseDate")
+            Seller: @house.Value("sellerName"),
+            Date: @house.Value("houseDate"),
+            Price: @house.Value("price"),
+            Area code: @house.Value("areaCodes")
         </p>
     </div>
 
     // divider between houses (only if not last house)
     counter++;
-    if(counter != pageSize)
+    if(counter < pageSize)
     {
         <hr class="my-4" />
     }
@@ -59,25 +150,24 @@
         <div class="paging-block">
             @if(pageNumber > 1)
             {
-                <a class="btn btn -primary float-right" href="@($"{houseList.Url()}?page={pageNumber - 1}&size={pageSize}")">Prev</a>
+                <a class="btn btn-primary float-right" href="@($"{houseList.Url()}?category={sortBy}&areaCode={areaCoder}&page={pageNumber - 1}&size={pageSize}")">Prev</a>
             }
             else
             {
                 @Html.Raw("&nbsp;");
             }
-        </div>
-        <div class="paging-block text-center">
-            <span>Page @pageNumber of @pageCount</span>
-        </div>
-        <div class="paging-block">
             @if(pageNumber < pageCount)
             {
-                <a class="btn btn-primary float-right" href="@($"{houseList.Url()}?page={pageNumber + 1}&size={pageSize}")">Next</a>
+                <a class="btn btn-primary float-right" href="@($"{houseList.Url()}?category={sortBy}&areaCode={areaCoder}&page={pageNumber + 1}&size={pageSize}")">Next</a>
             }
             else
             {
                 @Html.Raw("&nbsp;");
             }
+        </div>
+
+        <div class="paging-block text-center">
+            <span>Page @pageNumber of @pageCount</span>
         </div>
     }
 }
