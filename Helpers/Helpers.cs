@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Umbraco.Cms.Core.Services;
 
 namespace UmbracoTest.Helpers
 {
@@ -23,6 +24,16 @@ namespace UmbracoTest.Helpers
                 return stringValue;
             }
             return fallBack;
+        }
+
+        public class MyClass
+        {
+            private IDataTypeService _dataTypeService;
+
+            public MyClass(IDataTypeService dataTypeService)
+            {
+                _dataTypeService = dataTypeService;
+            }
         }
 
     }
