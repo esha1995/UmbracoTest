@@ -3,10 +3,11 @@
 @{
     var mediaPicker = Model.HasValue("mainImage") ? Model.Value<IPublishedContent>("mainImage") : Umbraco.Content(Guid.Parse("1f932451-adf4-4883-8e55-6cc3ab807401")).Value<IPublishedContent>("mainImage");
     var title = Model.HasValue("title") ? Model.Value("title") : Model.Name;
+    title = Model.HasValue("adress") ? Model.Value("adress") : title;
     var subtitle = Model.HasValue("subtitle") ? Model.Value("subtitle") : ""; 
 }
 
-    <header class="masthead" style="background-image: url('@mediaPicker.Url()')">
+<header class="masthead" style="background-image: url('@mediaPicker.Url()')">
     <div class="container position-relative px-4 px-lg-5">
         <div class="row gx-4 gx-lg-5 justify-content-center">
             <div class="col-md-10 col-lg-8 col-xl-7">
@@ -18,5 +19,3 @@
         </div>
     </div>
 </header>
-
-

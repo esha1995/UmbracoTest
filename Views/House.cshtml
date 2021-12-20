@@ -1,21 +1,27 @@
 ﻿@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@using Examine
 
 @{
 	Layout = "Master.cshtml";
+    var houseList = Umbraco.Content(Guid.Parse("b82ef794-6d89-4ccc-9b23-8ef35c3706cc"));
 }
 
 
 @Html.Partial("Partials/header")
 
-        <article class="mb-4">
-            <div class="container px-4 px-lg-5">
-                <div class="row gx-4 gx-lg-5 justify-content-center">
-                    <div class="col-md-10 col-lg-8 col-xl-7">
-                        @Html.GetGridHtml(Model, "mainContent", "Bootstrap3-fluid")       
-                    </div>
-                </div>
-            </div>
-        </article>
 
-@Html.Partial("Partials/footer")
+<article class="mb-4">
+    <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                <a class="btn btn-primary float-right" href="@(houseList.Url())">Go back</a>
+                <p class="post-meta">Seller: @Model.Value("sellerName")</p>
+                <p class="post-meta">Date: @Model.Value("houseDate"),</p>
+                <p class="post-meta">Price: @Model.Value("price"),</p>
+                <p class="post-meta">Area code: @Model.Value("areaCodes")</p>
+                @Html.GetGridHtml(Model, "mainContent")
+            </div>
+        </div>
+    </div>
+</article> 

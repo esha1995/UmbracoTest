@@ -1,0 +1,32 @@
+﻿@inherits UmbracoViewPage<Searching.Site.Model.ViewModels.SearchViewModel>
+@using Searching.Site.Controllers.Surface
+@model Searching.Site.Model.ViewModels.SearchViewModel
+@using(Html.BeginUmbracoForm<SearchSurfaceController>("SubmitForm", FormMethod.Post))
+{
+
+ 
+    var searchPage = Umbraco.Content(Guid.Parse("3f8087c6-deeb-490e-abf1-f1e55d5c2639"));
+
+    <div class="container">
+        <div class ="row">
+            <div class="form-group col-md-6">
+                @Html.LabelFor(model => model.Query)
+                <div class="input-group">
+                    @Html.TextBoxFor(model=> model.Query, new { @class = "form-control", placeholder = "Search..."})
+                    @Html.ValidationMessageFor(model => model.Query)
+                </div>
+            </div>
+                <div class="form-group col-md-6">
+                @Html.LabelFor(model => model.Category)
+                <div class="input-group">
+                    @Html.TextBoxFor(model => model.Category, new { @class = "form-control", placeholder = "Category..."})
+                    @Html.ValidationMessageFor(model => model.Category)
+                </div>
+            </div>
+            <div class = "form-group col-md-6">
+                <label>Search</label>
+               <button id="submit" class="btn btn-primary btn-block">Search</button>
+            </div>
+        </div>
+    </div>
+}
