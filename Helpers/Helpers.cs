@@ -16,7 +16,7 @@ namespace UmbracoTest.Helpers
             return fallbackvalue;
         }
 
-        public static string getQueryString(HttpContext request, string key, string fallBack)
+        public static string getQueryString(this HttpContext request, string key, string fallBack)
         {
             string stringValue = request.Request.Query[key];
             if(stringValue != null && !string.IsNullOrWhiteSpace(stringValue))
@@ -25,17 +25,6 @@ namespace UmbracoTest.Helpers
             }
             return fallBack;
         }
-
-        public class MyClass
-        {
-            private IDataTypeService _dataTypeService;
-
-            public MyClass(IDataTypeService dataTypeService)
-            {
-                _dataTypeService = dataTypeService;
-            }
-        }
-
     }
 }
 

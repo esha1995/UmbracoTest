@@ -38,24 +38,21 @@
             houses = Umbraco.Content(Guid.Parse("b82ef794-6d89-4ccc-9b23-8ef35c3706cc")).Children();
         }
         
-        // sort by depended in the category query
-        if(sortBy == "datelh")
+        switch (sortBy)
         {
-            houses = houses.Where(x => x.IsVisible()).OrderBy(y => y.Value("houseDate"));
+            case "datelh":
+                houses = houses.Where(x => x.IsVisible()).OrderBy(y => y.Value("houseDate"));
+                break;
+            case "datehl":
+                houses = houses.Where(x => x.IsVisible()).OrderByDescending(y => y.Value("houseDate"));
+                break;
+            case "pricelh":
+                houses = houses.Where(x => x.IsVisible()).OrderBy(y => y.Value("price"));
+                break;
+            case "pricehl":
+                houses = houses.Where(x => x.IsVisible()).OrderByDescending(y => y.Value("price"));
+                break;
         }
-        if (sortBy == "datehl")
-        {
-            houses = houses.Where(x => x.IsVisible()).OrderByDescending(y => y.Value("houseDate"));
-        }
-        if (sortBy == "pricelh")
-        {
-            houses = houses.Where(x => x.IsVisible()).OrderBy(y => y.Value("price"));
-        }
-        if (sortBy == "pricehl")
-        {
-            houses = houses.Where(x => x.IsVisible()).OrderByDescending(y => y.Value("price"));
-        }
-
     }
 
     // if not house list page (meaning home page then descend by date)
@@ -123,7 +120,6 @@ else if(!isHouseList)
     // create lidt of houses 
     var mediaPicker = (IPublishedContent)house.Value("mainImage");
     var adress = house.HasValue("adress") ? house.Value("adress") : house.Name;
-    
     if (mediaPicker != null)
     {
         <img src="@mediaPicker.Url()" style="width:200px" alt="@mediaPicker.Value("alt")" />
@@ -142,6 +138,7 @@ else if(!isHouseList)
     </div>
 
     // divider between houses (only if not last house)
+
     counter++;
     if(counter < pageSize)
     {
@@ -172,10 +169,10 @@ else if(!isHouseList)
     </div>
 
     <div class="paging-block text-center">
-        <span>Page @pageNumber of <strong>@pageCount</strong></span>
+        <span>Page <strong>@pageNumber</strong> of @pageCount</span>
     </div>
 }
-@if(!isHouseList)
+@if(!isHouseList) 
 {
     <a class="btn btn-primary float-right" href="@(houseList.Url())">See all houses for sell</a>
 }

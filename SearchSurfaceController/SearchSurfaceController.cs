@@ -16,6 +16,7 @@ namespace Searching.Site.Controllers.Surface
         public SearchSurfaceController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, IPublishedUrlProvider publishedUrlProvider) : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
         {
         }
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ActionName("SubmitForm")]
